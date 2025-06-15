@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+</head>
+<body>
+    <h2>Chat</h2>
+    <div id="chat" style="height: 300px; overflow-y: scroll; border: 1px solid #ccc; margin-bottom: 10px;"></div>
+    <input type="text" id="messageInput" placeholder="Type a message..." autofocus>
+    <button onclick="sendMessage()">Send</button>
+    <button onclick="clearMessages()">Clear Messages</button>
+    
+    <script>
+        const socket = io();
+        const chat = document.getElementById('chat');
+        const input = document.getElementById('messageInput');
+        
+        socket.on('chat_history', function(history) {
+            chat.innerHTML = '';
+            history.forEach(function(msg) {
+                appendMessage(msg);
+            });
+        });
+        
+        socket.on('message', function(msg) {
+            appendMessage(msg);
+        });
+        
+        socket.on('chat_cleared', function() {
+            chat.innerHTML = '';
+        });
+        
+        function appendMessage(msg) {
+            const message = document.createElement('div');
+            message.textContent = msg;
+            chat.appendChild(message);
+            chat.scrollTop = chat.scrollHeight;
+        }
+        
+        function sendMessage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const username= urlParams.get('username');
+            const password= urlParams.get('password');
+            const msg = input.value.trim();
+            // username = "Sidh";
+            passwords = {
+                "saihsu" : "Pokemon10", 
+                "aki" : "blue wo wo",
+                "parker" : "push pop",
+                "henry" : "fruipoe",
+            };
+            if (password == passwords[username]){
+                user = username;
+            }
+            else{
+                user = "who knows?";
+            }
+            // check if the username and password are correct, otherwise set the username to be 'unknown'
+            var msg_sent = msg;
+            if (msg) {
+                switch(msg){
+                    case( "supercalifragilisticexpialidocious"):
+                        msg_sent = "supercalifragilisticexpialidocious even though the sound of it is something quite atrocious";
+                        break;
+                    
+                    case( "/octodisco"):
+                        msg_sent = "🐙🐙🐙";
+                        break;
+                    case( "/tableback"):
+                        msg_sent =  "┬─┬ ノ( ゜-゜ノ)";
+                        break;
+                    
+                    case( "/tableflip"):
+                        msg_sent =  "(╯°□°)╯︵ ┻━┻";
+                        break;
+                    
+                    case( "/flowerbeam"):
+                        msg_sent =  "( ・◡・)つ━☆🌸🌺🌼";
+                        break;
+                    
+                    case( "/dogsrule"):
+                        msg_sent =  "🐶🐩🐕‍🦺🦮🥇🦮🐕‍🦺🐩🐶";
+                        break;
+                    
+                }
+                
+                
+                socket.send (user + ": " + msg_sent);
+                input.value = '';
+                
+            }
+        }
+        
+        function clearMessages() {
+            socket.emit('clear_messages');
+        }
+        
+        input.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>
